@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GUI Controls with Error Handling</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px;
+        }
+        #progress-bar {
+            width: 200px;
+            height: 20px;
+            border: 1px solid #000;
+            background-color: #f3f3f3;
+            position: relative;
+            margin-top: 10px;
+        }
+        #progress {
+            width: 0;
+            height: 100%;
+            background-color: #4caf50;
+            position: absolute;
+        }
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            width: 220px;
+            margin-top: 10px;
+        }
+        .error {
+            color: red;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>GUI Controls with Error Handling</h1>
+    <label id="dynamic-label">Label Text</label>
+    <br>
+    <button id="click-button">Click Me</button>
+    <br>
+    <input type="text" id="text-entry" placeholder="Type something">
+    <div class="error" id="entry-error"></div>
+    <br>
+    <input type="checkbox" id="checkbox"> Check Me
+    <div class="error" id="checkbox-error"></div>
+    <br>
+    <div id="progress-bar">
+        <div id="progress"></div>
+    </div>
+    <div class="button-group">
+        <button id="start-button">Start Progress</button>
+        <button id="stop-button" disabled>Stop Progress</button>
+    </div>
+
+    <script>
+        // Get elements
+        const dynamicLabel = document.getElementById('dynamic-label');
+        const clickButton = document.getElementById('click-button');
+        const textEntry = document.getElementById('text-entry');
+        const entryError = document.getElementById('entry-error');
+        const checkbox = document.getElementById('checkbox');
+        const checkboxError = document.getElementById('checkbox-error');
+        const progressBar = document.getElementById('progress');
+        const startButton = document.getElementById('start-button');
+        const stopButton = document.getElementById('stop-button');
+        
+        // Event handler for button click
+        clickButton.addEventListener('click', () => {
+            try {
+                dynamicLabel.textContent = 'Button clicked!';
+            } catch (error) {
+                console.error("Error updating label: ", error);
+            }
+        });
+
+        // Event handler for text entry
+        textEntry.addEventListener('input', () => {
+            try {
+                if (textEntry.value.trim() === "") {
+                    throw new Error("Text entry cannot be empty.");
+                }
+                entryError.textContent = "";
+                dynamicLabel.textContent = textEntry.value;
+            } catch (error) {
+                entryError.textContent = error.message;
+            }
+        });
+
+        // Event handler for checkbox toggle
+        checkbox.addEventListener('change', () => {
+            try {
+                if (!checkbox.checked) {
+                    throw new Error("Checkbox must be checked.");
+                }
+                checkboxError.textContent = "";
+                dynamicLabel.textContent = 'Checkbox checked!';
+            } catch (error) {
+                checkboxError.textContent = error.message;
+            }
+        });
+
+        // Variables for progress bar
+        let progressInterval;
+
+        // Function to start progress
+        function startProgress() {
+            try {
+                if (textEntry.value.trim() === "") {
+                    throw new Error("Cannot start progress: Text entry is empty.");
+                }
+                progressBar.style.width = '0%';
+                startButton.disabled = true;
+                stopButton.disabled = false;
+                progressInterval = setInterval(() => {
+                    let currentWidth = parseInt(progressBar.style.width);
+                    if (currentWidth >= 100) {
+                        clearInterval(progressInterval);
+                    } else {
+                        progressBar.style.width = (currentWidth + 1) + '%';
+                    }
+                }, 100);
+            } catch (error) {
+                console.error("Error starting progress: ", error);
+            }
+        }
+
+        // Function to stop progress
+        function stopProgress() {
+            try {
+                clearInterval(progressInterval);
+                startButton.disabled = false;
+                stopButton.disabled = true;
+            } catch (error) {
+                console.error("Error stopping progress: ", error);
+            }
+        }
+
+        // Event handlers for progress bar buttons
+        startButton.addEventListener('click', startProgress);
+        stopButton.addEventListener('click', stopProgress);
+    </script>
+
+</body>
+</html>
